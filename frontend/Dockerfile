@@ -1,19 +1,27 @@
-FROM node:20.11.1-slim AS builder
+# Development stage
+FROM node:20.11.1-slim AS development
 
 # Add work directory
 WORKDIR /react-app
 
-COPY package.json .
+COPY package*.json .
 
 RUN npm install
 
 # Copy app files
 COPY . .
 
+EXPOSE 3000
+
+CMD ["npm", "run", "dev"]
+
+# Build stage
+FROM development AS build
+
 # Build the app
 RUN npm run build
 
-# Separate stage for production image
+# Production stage (for deployable image)
 FROM nginx:1.24.0-alpine as production
 ENV NODE_ENV production
 
@@ -26,5 +34,4 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Expose port
 EXPOSE 80
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
