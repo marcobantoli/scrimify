@@ -1,8 +1,18 @@
 version: '3.8'
 services:
-  scrimify:
+  react-app:
     build:
-      context: .
+      context: frontend
+    ports:
+      - 80:3000
+    expose:
+      - 3000
+    depends_on:
+      - rest-service
+
+  rest-service:
+    build:
+      context: rest-service
       target: development
     ports:
       - '8000:8000'
